@@ -43,16 +43,16 @@ func main() {
 	}()
 
 	// get column data.
-	coll := client.Database("test").Collection("students")
+	coll := client.Database("users").Collection("users")
 
-	title := "Hello World"
+	name := "Kai Havertz"
 
 	var result bson.M
 
-	err = coll.FindOne(context.TODO(), bson.D{{Key: "title", Value: title}}).Decode(&result)
+	err = coll.FindOne(context.TODO(), bson.D{{Key: "name", Value: name}}).Decode(&result)
 
 	if err == mongo.ErrNoDocuments {
-		fmt.Printf("No document with title %s was found", title)
+		fmt.Printf("No document with Name: %s was found", name)
 		return
 	}
 
@@ -120,6 +120,14 @@ func main() {
 	update = bson.D{{Key: "$mul", Value: bson.D{{Key: "price", Value: 1.22}}}}
 
 	_, err = coll.UpdateMany(context.TODO(), filter, update)
+
+	if err != nil {
+		panic(err)
+	}
+
+	// delete a document.
+	filter = bson.D{{Key: "name", Value: "Greatness"}}
+	_, err = coll.DeleteOne(context.TODO(), filter)
 
 	if err != nil {
 		panic(err)
