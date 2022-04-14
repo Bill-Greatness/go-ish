@@ -17,53 +17,64 @@ func main() {
 	// getting started with the mongoDB driver.
 
 	// check availability with godotenv
-
 	if err := godotenv.Load(); err != nil {
-		log.Println("Go env file is not available.")
+		log.Print("MONGO Environment Variable Not Set")
 	}
 
-	// get uri from environment.
 	uri := os.Getenv("MONGO_URI")
 
-	// check if uri is not empty or exit with a message.
+	// check if uri is empty
+
 	if uri == "" {
-		log.Fatal("You must set MONGO_URI environment variable")
+		log.Fatal("You must set your MONGO_URI environment variable")
 	}
 
-	// connecting to the client.
 	client, err := mongo.Connect(context.TODO(), options.Client().ApplyURI(uri))
 
-	// check if there is connection with the connection uri above
 	if err != nil {
 		panic(err)
 	}
-
-	// try disconnection the cotext.TODO from client.
-	// inline function.
+	// check and disconnect after everything
 	defer func() {
-		if err := client.Disconnect(context.TODO()); err != nil {
+		if err = client.Disconnect(context.TODO()); err != nil {
 			panic(err)
 		}
 	}()
 
-	// access content.
-	coll := client.Database("test").Collection("student")
-	title := "Hello Greatness"
+	// get column data.
+	coll := client.Database("test").Collection("students")
+
+	title := "Hello World"
 
 	var result bson.M
 
-	err = coll.FindOne(context.TODO(), bson.D{{"title", title}}).Decode(&result)
+	err = coll.FindOne(context.TODO(), bson.D{{Key: "title", Value: title}}).Decode(&result)
 
 	if err == mongo.ErrNoDocuments {
-		log.Println("There are no documents in this collection.")
+		fmt.Printf("No document with title %s was found", title)
+		return
 	}
 
 	if err != nil {
 		panic(err)
 	}
-	jsonData, err := json.MarshalIndent(result, "", "")
+
+	jsonData, err := json.MarshalIndent(result, "", "    ")
+
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("Your query data :%v", jsonData)
+
+	fmt.Printf("%s\n", jsonData)
+
+	// finding multiple documents
+	filter := bson.D{{Key: "pop", Value: bson.D{{Key: "$lte", Value: 500}}}}
+
+	cursor, err := coll.Find(context.TODO(), filter)
+
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%v", cursor)
+
 }
