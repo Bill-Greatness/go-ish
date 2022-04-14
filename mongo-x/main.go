@@ -9,6 +9,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -77,4 +78,50 @@ func main() {
 	}
 	fmt.Printf("%v", cursor)
 
+	// inserting a document.
+
+	doc := bson.D{{Key: "title", Value: "Beyond Intelligence"}, {Key: "content", Value: "We can make things right!"}}
+
+	_, err = coll.InsertOne(context.TODO(), doc)
+
+	if err != nil {
+		panic(err)
+	}
+
+	// inserting multiple documents.
+	docs := []interface{}{
+		bson.D{{Key: "name", Value: "Bill Greatness"}, {Key: "status", Value: "Active"}},
+		bson.D{{Key: "name", Value: "Anon"}, {Key: "status", Value: "Active"}},
+	}
+
+	_, err = coll.InsertMany(context.TODO(), docs)
+	if err != nil {
+		panic(err)
+	}
+
+	// updating a document.
+	// get ID field that needs the update
+	id, _ := primitive.ObjectIDFromHex("someRandomeID")
+
+	filter = bson.D{{Key: "_id", Value: id}}
+
+	update := bson.D{{Key: "$set", Value: bson.D{{Key: "rating", Value: 4.42}}}}
+
+	_, err = coll.UpdateOne(context.TODO(), filter, update)
+
+	if err != nil {
+		panic(err)
+	}
+
+	//updating multiple documents.
+
+	filter = bson.D{{Key: "address.market", Value: "Syndey"}}
+
+	update = bson.D{{Key: "$mul", Value: bson.D{{Key: "price", Value: 1.22}}}}
+
+	_, err = coll.UpdateMany(context.TODO(), filter, update)
+
+	if err != nil {
+		panic(err)
+	}
 }
