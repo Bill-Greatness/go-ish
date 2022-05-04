@@ -67,9 +67,9 @@ func printSlice(s string, x []int) {
 
 func makeTic() {
 	board := [][]string{
-		[]string{"_", "_", "_"},
-		[]string{"_", "_", "_"},
-		[]string{"_", "_", "_"},
+		{"_", "_", "_"},
+		{"_", "_", "_"},
+		{"_", "_", "_"},
 	}
 
 	// turing of players.
