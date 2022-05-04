@@ -6,16 +6,18 @@ import (
 
 // user model definitions.
 type User struct {
-	Name    string `json:"name" validate:"required"`
-	Age     int32  `json:"age" validate:"required"`
-	Email   string `json:"email"`
-	Country string `json:"countryOfOrigin" validate:"required"`
+	Name    string `bson:"name,omitempty" validate:"required"`
+	Age     int32  `bson:"age,omitempty" validate:"required"`
+	Email   string `bson:"email"`
+	Country string `bson:"countryOfOrigin" validate:"required"`
 }
 
 func (user *User) Validate() error {
 	validator := validator.New()
 	return validator.Struct(user)
 }
+
+// convert user to bson.
 
 // Inserting New User
 
